@@ -48,41 +48,61 @@ def sohbet():
 
 @api_bp.route("/leads", methods=["POST"])
 def lead_kaydet():
-    veri = request.get_json(silent=True) or {}
+    try:
+        veri = request.get_json(silent=True) or {}
 
-    isim = veri.get("isim")
-    telefon = veri.get("telefon")
-    mesaj = veri.get("mesaj")
+        isim = veri.get("isim")
+        telefon = veri.get("telefon")
+        mesaj = veri.get("mesaj")
 
-    if not isim or not telefon:
+        if not isim or not telefon:
+            return jsonify({
+                "basari": False,
+                "hata": "Isim ve telefon alanlari zorunludur."
+            }), 400
+
+        lead_ekle(isim, telefon, mesaj)
+
+        return jsonify({
+            "basari": True,
+            "mesaj": "Lead basariyla kaydedildi."
+        }), 201
+
+    except Exception as hata:
+        print("Lead kaydetme hatasi:", hata)
+
         return jsonify({
             "basari": False,
-            "hata": "Isim ve telefon alanlari zorunludur."
-        }), 400
+            "hata": "Lead kaydedilirken bir hata olustu."
+        }), 500
 
-    lead_ekle(isim, telefon, mesaj)
-
-    return jsonify({
-        "basari": True,
-        "mesaj": "Lead basariyla kaydedildi."
-    }), 201
 
 @api_bp.route("/leads", methods=["GET"])
 def leadleri_getir():
-    leadler = tum_leadler()
+    try:
+        leadler = tum_leadler()
 
-    sonuc = []
+        sonuc = []
 
-    for lead in leadler:
-        sonuc.append({
-            "id": lead["id"],
-            "isim": lead["isim"],
-            "telefon": lead["telefon"],
-            "mesaj": lead["mesaj"],
-            "tarih": lead["tarih"]
+        for lead in leadler:
+            sonuc.append({
+                "id": lead["id"],
+                "isim": lead["isim"],
+                "telefon": lead["telefon"],
+                "mesaj": lead["mesaj"],
+                "tarih": lead["tarih"]
+            })
+
+        return jsonify({
+            "basari": True,
+            "leadler": sonuc
         })
 
-    return jsonify({
-        "basari": True,
-        "leadler": sonuc
+    except Exception as hata:
+        print("Lead listeleme hatasi:", hata)
+
+        return jsonify({
+            "basari": False,
+            "hata": "Lead verileri alinirken bir hata olustu."
+        }), 500
     })
