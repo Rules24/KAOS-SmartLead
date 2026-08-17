@@ -35,6 +35,12 @@ class AIService:
             return response
 
         except requests.RequestException as hata:
+            print("GROQ HATASI:", hata)
+
+            if hasattr(hata, "response") and hata.response is not None:
+                print("GROQ STATUS:", hata.response.status_code)
+                print("GROQ CEVAP:", hata.response.text)
+
             raise AIServiceError(
                 f"Yapay zeka servisine baglanirken hata olustu: {hata}"
             ) from hata
@@ -70,5 +76,6 @@ class AIService:
             raise AIServiceError(
                 f"Yapay zeka yaniti okunamadi: {hata}"
             ) from hata
+
 
 ai_service = AIService()
