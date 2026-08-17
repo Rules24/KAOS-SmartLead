@@ -105,4 +105,3 @@ def leadleri_getir():
             "basari": False,
             "hata": "Lead verileri alinirken bir hata olustu."
         }), 500
-    })
